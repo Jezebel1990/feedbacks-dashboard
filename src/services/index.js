@@ -19,28 +19,33 @@ httpClient.interceptors.request.use(config => {
   const token = window.localStorage.getItem('token')
 
   if (token) {
-    config.headers.common.Authorization = `Bearer ${token}`
+    config.headers = config.headers || {}
+    config.headers.Authorization = `Bearer ${token}`
   }
+
   return config
+}, (error) => {
+  setGlobalLoading(false)
+  return Promise.reject(error)
 })
 
 httpClient.interceptors.response.use((response) => {
   setGlobalLoading(false)
   return response
 }, (error) => {
-  const canThrowAnError = error.request.status === 0 ||
-  error.request.status === 500
+  setGlobalLoading(false)
 
-  if (canThrowAnError) {
-    setGlobalLoading(false)
+  const status = error?.response?.status
+
+  if (status === 0 || status === 500) {
     throw new Error(error.message)
   }
 
-  if (error.reponse.status === 401) {
+  if (status === 401) {
     router.push({ name: 'Home' })
   }
-  setGlobalLoading(false)
-  return error
+
+  return Promise.reject(error)
 })
 
 export default {
