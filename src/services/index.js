@@ -1,11 +1,11 @@
 import axios from 'axios'
 import router from '../router'
+import { setGlobalLoading } from '../store/global'
 import AuthService from './auth'
-import UserService from './users'
-import { setGlobalLoading } from '@/store/global'
+import UsersService from './users'
 
 const API_ENVS = {
-  production: '',
+  production: 'https://backend-treinamento-vue3.vercel.app',
   development: '',
   local: 'http://localhost:3000'
 }
@@ -19,36 +19,33 @@ httpClient.interceptors.request.use(config => {
   const token = window.localStorage.getItem('token')
 
   if (token) {
-    config.headers = config.headers || {}
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.common.Authorization = `Bearer ${token}`
   }
 
   return config
-}, (error) => {
-  setGlobalLoading(false)
-  return Promise.reject(error)
 })
 
 httpClient.interceptors.response.use((response) => {
   setGlobalLoading(false)
   return response
 }, (error) => {
-  setGlobalLoading(false)
+  const canThrowAnError = error.request.status === 0 ||
+    error.request.status === 500
 
-  const status = error?.response?.status
-
-  if (status === 0 || status === 500) {
+  if (canThrowAnError) {
+    setGlobalLoading(false)
     throw new Error(error.message)
   }
 
-  if (status === 401) {
+  if (error.response.status === 401) {
     router.push({ name: 'Home' })
   }
 
-  return Promise.reject(error)
+  setGlobalLoading(false)
+  return error
 })
 
 export default {
   auth: AuthService(httpClient),
-  users: UserService(httpClient)
+  users: UsersService(httpClient)
 }
