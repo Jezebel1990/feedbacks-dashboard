@@ -20,7 +20,9 @@
    </h1>
    <suspense>
     <template #default>
-     <filters />
+     <filters
+      class="mt-8 animate__animated animate__fadeIn animate__faster"
+     />
     </template>
     <template #fallback>
      loading....
