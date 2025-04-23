@@ -25,7 +25,7 @@
      />
     </template>
     <template #fallback>
-     loading....
+     <filters-loading class="mt-8"/>
     </template>
    </suspense>
 
@@ -37,9 +37,10 @@
 </template>
 <script>
 import Filters from './Filters'
+import FiltersLoading from './FiltersLoading'
 import HeaderLogged from '../../components/HeaderLogged'
 
 export default {
-  components: { HeaderLogged, Filters }
+  components: { HeaderLogged, Filters, FiltersLoading }
 }
 </script>
