@@ -20,7 +20,8 @@ httpClient.interceptors.request.use(config => {
   const token = window.localStorage.getItem('token')
 
   if (token) {
-    config.headers.common.Authorization = `Bearer ${token}`
+    config.headers = config.headers || {}
+    config.headers.Authorization = `Bearer ${token}`
   }
 
   return config
@@ -30,21 +31,24 @@ httpClient.interceptors.response.use((response) => {
   setGlobalLoading(false)
   return response
 }, (error) => {
-  const canThrowAnError = error.request.status === 0 ||
-    error.request.status === 500
+  setGlobalLoading(false)
 
+  const requestStatus = error.request?.status
+  const responseStatus = error.response?.status
+  const canThrowAnError = requestStatus === 0 || requestStatus === 500
   if (canThrowAnError) {
-    setGlobalLoading(false)
     throw new Error(error.message)
   }
 
-  if (error.response.status === 401) {
+  if (responseStatus === 401) {
     router.push({ name: 'Home' })
   }
+  const customError = new Error(error.message)
+  customError.status = responseStatus ?? null
 
-  setGlobalLoading(false)
-  return error
-})
+  return Promise.reject(customError)
+}
+)
 
 export default {
   auth: AuthService(httpClient),
