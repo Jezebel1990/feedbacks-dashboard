@@ -6,13 +6,13 @@ import UsersService from './users'
 import FeedbacksService from './feedbacks'
 
 const API_ENVS = {
-  production: 'https://backend-treinamento-vue3.vercel.app',
-  development: '',
+  production: 'https://backend-vue3-snowy.vercel.app',
+  development: 'https://backend-vue3-snowy.vercel.app',
   local: 'http://localhost:3000'
 }
 
 const httpClient = axios.create({
-  baseURL: API_ENVS.local
+  baseURL: API_ENVS[process.env.NODE_ENV] || API_ENVS.production
 })
 
 httpClient.interceptors.request.use(config => {
