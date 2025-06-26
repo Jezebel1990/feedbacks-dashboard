@@ -33,8 +33,7 @@
         class="flex py-3 pl-5 mt-2 rounded justify-between items-center bg-brand-gray w-full lg:w-1/2"
       >
         <span v-if="state.hasError">Erro ao carregar a apiKey</span>
-        <span v-else id="apikey">{{ store.User?.currentUser?.apiKey || 'Carregando...' }}</span>
-
+        <span v-else id="apikey">{{ store.User.currentUser.apiKey }}</span>
         <div class="flex ml-20 mr-5" v-if="!state.hasError">
           <icon
             @click="handleCopy"
@@ -59,7 +58,7 @@
       </p>
 
       <content-loader
-        v-if="store.Global?.isLoading || state.isLoading"
+        v-if="store.Global.isLoading || state.isLoading"
         class="rounded"
         width="600px"
         height="50px"
@@ -75,7 +74,7 @@
   defer
   async
   onload="init('{{store.User.currentUser.apiKey}}')"
-  src="https://Jezebel1990-feedbacker-widget.netlify.app/init.js"
+  src="https://jezebel1990-feedbacker-widget.netlify.app/init.js"
 &gt;&lt;/script&gt;
         </pre>
       </div>
@@ -105,13 +104,11 @@ export default {
     })
 
     watch(
-      () => store.User?.currentUser?.apiKey,
-      (newVal) => {
-        if (!store.Global?.isLoading && !newVal) {
+      () => store.User.currentUser, () => {
+        if (!store.Global.isLoading && !store.User.currentUser.apiKey) {
           handleError(true)
         }
-      }
-    )
+      })
 
     function handleError (error) {
       state.isLoading = false
@@ -133,7 +130,7 @@ export default {
       toast.clear()
 
       try {
-        await navigator.clipboard.writeText(store.User?.currentUser?.apiKey || '')
+        await navigator.clipboard.writeText(store.User.currentUser.apiKey)
         toast.success('Copiado!')
       } catch (error) {
         handleError(error)
